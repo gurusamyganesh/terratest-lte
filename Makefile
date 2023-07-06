@@ -3,6 +3,5 @@ init:
 	terraform -chdir="./app" init
 plan:
 	terraform -chdir="./app" plan
-execute:
-	echo "executing"
-	dir ./app
+test:
+	cd ./app/terratest/test && go test -v
