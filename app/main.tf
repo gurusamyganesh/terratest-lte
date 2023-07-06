@@ -1,18 +1,3 @@
-provider "aws" {
-  region = var.region
-  # profile = "terraform-user1" 
-  # profile = "terraform-user1" 
-}
-
-terraform {
-  required_providers {
-    aws = {
-      source = "hashicorp/aws"
-      version = "~>5.0"
-    }
-  }
-}
-
 locals {
   environment = terraform.workspace
 }

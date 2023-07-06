@@ -1,7 +1,7 @@
 package test
 
 import (
-	// "fmt"
+	"fmt"
 	"testing"
 
 	"github.com/gruntwork-io/terratest/modules/aws"
@@ -47,10 +47,17 @@ func TestTerraformAwsNetworkExample(t *testing.T) {
 	privateSubnetId := terraform.Output(t, terraformOptions, "private_subnet_id")
 	vpcId := terraform.Output(t, terraformOptions, "vpc_id")
 
+	fmt.Print("################################ *******************************")
 	subnets := aws.GetSubnetsForVpc(t, vpcId, awsRegion)
+	fmt.Print("################################ Six subnets created test - started")
 	require.Equal(t, 6, len(subnets))
+	fmt.Print("################################ Six subnets created test - ended")
 	// Verify if the network that is supposed to be public is really public
+	fmt.Print("################################ Public subnets created test - started")
 	assert.True(t, aws.IsPublicSubnet(t, publicSubnetId, awsRegion))
+	fmt.Print("################################ Public subnets created test - Ended")
 	// Verify if the network that is supposed to be private is really private
+	fmt.Print("################################ Private subnets created test - started")
 	assert.False(t, aws.IsPublicSubnet(t, privateSubnetId, awsRegion))
+	fmt.Print("################################ Private subnets created test - Ended")
 }
