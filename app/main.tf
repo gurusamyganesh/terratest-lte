@@ -1,10 +1,7 @@
 provider "aws" {
   region = var.region
-<<<<<<< HEAD
   # profile = "terraform-user1" 
-=======
-  profile = "terraform-user1" 
->>>>>>> 83dbc4668a200f965ff05618bf31a41c18195c78
+  # profile = "terraform-user1" 
 }
 
 terraform {
