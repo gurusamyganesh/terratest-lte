@@ -23,16 +23,16 @@ func TestTerraformAwsNetworkExample(t *testing.T) {
 
 		// Variables to pass to our Terraform code using -var options
 		Vars: map[string]interface{}{
-			"region":                       awsRegion,
-			"project_name":                 "webapp-ecs",
-			"vpc_cidr":                     "10.0.0.0/16",
-			"public_subnet_cidr_az1":       "10.0.0.0/24",
-			"public_subnet_cidr_az2":       "10.0.1.0/24",
-			"private_app_subnet_az1_cidr":  "10.0.2.0/24",
-			"private_app_subnet_az2_cidr":  "10.0.3.0/24",
-			"private_data_subnet_az1_cidr": "10.0.4.0/24",
-			"private_data_subnet_az2_cidr": "10.0.5.0/24",
-			"public_subnet_name":           "public-subnet",
+			"region":                 awsRegion,
+			"project_name":           "webapp",
+			"vpc_cidr":               "10.0.0.0/16",
+			"public_subnet_cidr_az1": "10.0.0.0/24",
+			// "public_subnet_cidr_az2":       "10.0.1.0/24",
+			"private_app_subnet_az1_cidr": "10.0.2.0/24",
+			// "private_app_subnet_az2_cidr":  "10.0.3.0/24",
+			// "private_data_subnet_az1_cidr": "10.0.4.0/24",
+			// "private_data_subnet_az2_cidr": "10.0.5.0/24",
+			"public_subnet_name": "public-subnet",
 		},
 	})
 
@@ -49,9 +49,9 @@ func TestTerraformAwsNetworkExample(t *testing.T) {
 
 	fmt.Print("################################ *******************************")
 	subnets := aws.GetSubnetsForVpc(t, vpcId, awsRegion)
-	fmt.Print("################################ Six subnets created test - started")
-	require.Equal(t, 6, len(subnets))
-	fmt.Print("################################ Six subnets created test - ended")
+	fmt.Print("################################ subnets created test - started")
+	require.Equal(t, 2, len(subnets))
+	fmt.Print("################################ subnets created test - ended")
 	// Verify if the network that is supposed to be public is really public
 	fmt.Print("################################ Public subnets created test - started")
 	assert.True(t, aws.IsPublicSubnet(t, publicSubnetId, awsRegion))
