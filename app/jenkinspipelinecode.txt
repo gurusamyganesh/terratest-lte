@@ -1,0 +1,96 @@
+pipeline {
+    agent any
+    stages {
+        stage ("checkout") {
+            steps {
+                checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[credentialsId: 'Jenkins-Git-Integration', url: 'https://github.com/gurusamyganesh/terratest-lte.git']])
+            }
+        }
+        stage ("init") {
+            steps {
+                withAWS(credentials: 'Cloudbee', region: 'us-east-2') {
+                    script {
+                        def output = sh(returnStdout: true, script: 'make init')
+                        echo "Output: ${output}"
+                    }
+                }
+            }
+        }
+        stage ("plan") {
+            steps {
+                script {
+                    withAWS(credentials: 'Cloudbee', region: 'us-east-2') {
+                        def output = sh(returnStdout: true, script: 'make plan')
+                        echo "Output: ${output}"
+                    }
+                }
+            }
+        }
+        stage ("test") {
+            steps {
+                script {
+                    withAWS(credentials: 'Cloudbee', region: 'us-east-2') {
+                        def output = sh(returnStdout: true, script: 'make test')
+                        echo "Output: ${output}"
+                    }
+                }
+            }
+        }
+        stage ("apply") {
+            steps {
+                script {
+                    withAWS(credentials: 'Cloudbee', region: 'us-east-2') {
+                        def output = sh(returnStdout: true, script: 'make apply')
+                        echo "Output: ${output}"
+                    }
+                }
+            }
+        }        
+        stage ("test-lambdafunction") {
+            steps {
+                withAWS(credentials: 'Cloudbee', region: 'us-east-2') {
+                    script {
+                        def output = sh(returnStdout: true, script: 'aws lambda invoke --function-name webapp-lambda-function out.txt')
+                        echo "Output: ${output}"
+                        output = readFile('out.txt').trim()
+                        if (output.contains('"statusCode": 200')) {
+                            currentBuild.result = "SUCCESS"
+                        }
+                        else {
+                            withAWS(credentials: 'Cloudbee', region: 'us-east-2') {
+                                output = sh(returnStdout: true, script: 'make destroy')
+                                echo "Output: ${output}"
+                            }                            
+                            currentBuild.result = "FAILURE"
+                        }
+                    }
+                }
+            }
+        }
+        stage ("destory") {
+            steps {
+                script {
+                    withAWS(credentials: 'Cloudbee', region: 'us-east-2') {
+                        def output = sh(returnStdout: true, script: 'make destroy')
+                        echo "Output: ${output}"
+                    }
+                }
+            }
+        }        
+    }
+    post {
+        always {
+            echo 'clean up workspace'
+            deleteDir()
+        }
+        success {
+            echo 'pipeline succeeded!'
+        }
+        unstable {
+            echo 'pipeline unstable :/'
+        }
+        failure {
+            echo 'pipeline failed :('
+        }
+    }    
+}
