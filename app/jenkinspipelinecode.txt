@@ -1,12 +1,12 @@
 pipeline {
     agent any
     stages {
-        stage ("checkout") {
+        stage ("GIT-Checkout") {
             steps {
                 checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[credentialsId: 'Jenkins-Git-Integration', url: 'https://github.com/gurusamyganesh/terratest-lte.git']])
             }
         }
-        stage ("init") {
+        stage ("Terraform-init") {
             steps {
                 withAWS(credentials: 'Cloudbee', region: 'us-east-2') {
                     script {
@@ -16,7 +16,7 @@ pipeline {
                 }
             }
         }
-        stage ("plan") {
+        stage ("Terraform-Plan") {
             steps {
                 script {
                     withAWS(credentials: 'Cloudbee', region: 'us-east-2') {
@@ -26,7 +26,7 @@ pipeline {
                 }
             }
         }
-        stage ("test") {
+        stage ("Test-Env") {
             steps {
                 script {
                     withAWS(credentials: 'Cloudbee', region: 'us-east-2') {
@@ -36,7 +36,7 @@ pipeline {
                 }
             }
         }
-        stage ("apply") {
+        stage ("Apply") {
             steps {
                 script {
                     withAWS(credentials: 'Cloudbee', region: 'us-east-2') {
@@ -46,7 +46,7 @@ pipeline {
                 }
             }
         }        
-        stage ("test-lambdafunction") {
+        stage (Ttest-Lambdafunction") {
             steps {
                 withAWS(credentials: 'Cloudbee', region: 'us-east-2') {
                     script {
@@ -54,6 +54,7 @@ pipeline {
                         echo "Output: ${output}"
                         output = readFile('out.txt').trim()
                         if (output.contains('"statusCode": 200')) {
+                            echo "#####################################Test Success######################################"                            
                             currentBuild.result = "SUCCESS"
                         }
                         else {
@@ -67,7 +68,7 @@ pipeline {
                 }
             }
         }
-        stage ("destory") {
+        stage ("Destory") {
             steps {
                 script {
                     withAWS(credentials: 'Cloudbee', region: 'us-east-2') {
